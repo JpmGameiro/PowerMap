@@ -1,0 +1,229 @@
+@startuml
+
+class Utils{
++{static}randomNum(min:int, max:int):int
+}
+
+
+PowerMapCtrl --* PowerMapModel : model
+PowerMapCtrl --* PowerMapView : view
+
+package console{
+class PowerMapCtrl{
+
++ {static} main(args:String[]):void
+- run() : void
+- rotateCell(click:Location):void
+- toast(msg:String):void
+- loadLevel(fileName:String):boolean
+}
+}
+
+package model{
+interface CellListener {
+    {abstract}draw(on:boolean):void
+}
+enum State {
+    UP,DOWN,LEFT,RIGTH
+}
+class PowerMapModel{
+-numLines:int
+-numCols:int
++xPower:int
++yPower:int
+-PowerViewListener viewer
+-board:Cell[][]
+-boardOn:boolean[][]
++{static} numHomesOn:int
+-homes:ArrayList<Home>
++getNumLines():int
++getNumColumns():int
++setChangeListener(view:PowerViewListener):void
++isCompleted():boolean
++rotate(lin:int, col:int):void
+-setCell (c :Cell, x:int, y:int): void
++getCell(x:int, y:int): Cell
++checkNeighbours(c:Cell):void
+-verifyOn(cell:Cell):void
++loadLevel(file:FileReader):void throws IOException
+}
+
+Cell --* State : state
+abstract class Cell {
+- x : int
+- y : int
++ on : boolean
++ Cell (x : int, y : int)
++ getX() : int
++ getY() : int
++ {abstract} getState () : State
++ {abstract} rotate() : void
++ {abstract} initiateState (state : State) : void
++ {abstract} hasState(state : State) : boolean
+}
+
+class Branch --|> Cell
+class Branch{
++ state : State
++ on : boolean
+- list : LinkedList<State>
++ Branch (x : int, y : int, state : State)
++ initiateState ( state : State) : void
++ hasState ( state : State) : boolean
++ rotate() : void
++getState():State
++ {static} createRandom(x : int, y : int) : Branch
+}
+
+class Curve --|> Cell
+class Curve{
++ state : State
++ on : boolean
+- list : LinkedList<State>
+
++ Curve (x : int, y : int, state : State)
+
++ getState () : State
++ rotate() : void
++ initiateState ( state : State) : void
++ hasState ( state : State) : boolean
+
++ {static} createRandom(x : int, y : int) : Curve
+}
+class Home --|> Cell
+class Home{
++ state : State
++ on : boolean
+- list : LinkedList<State>
+
++ Home (x : int, y : int, state : State)
+
++ getState () : State
++ rotate() : void
++ initiateState ( state : State) : void
++ hasState ( state : State) : boolean
+
++ {static} createRandom(x : int, y : int) : Home
+}
+class Line --|> Cell
+class Line{
++ state : State
++ on : boolean
+- list : LinkedList<State>
+
++ Line (x : int, y : int, state : State)
+
++ getState () : State
++ rotate() : void
++ initiateState ( state : State) : void
++ hasState ( state : State) : boolean
+
++ {static} createRandom(x : int, y : int) : Line
+}
+class Power --|> Cell
+class Power{
++ state : State
+- list : LinkedList<State>
+
++ Power (x : int, y : int, state : State)
+
++ getState () : State
++ rotate() : void
++ initiateState ( state : State) : void
++ hasState ( state : State) : boolean
+
++ {static} createRandom(x : int, y : int) : Power
+}
+}
+
+package view {
+
+interface PowerViewListener {
+    {abstract}repaint(x:int, y:int, on boolean):void
+}
+
+class PowerMapView ..|> PowerViewListener
+class PowerMapView{
++{static} final CELL_HEIGHT:int
++{static} final CELL_WIDTH:int
+-cellView : CellView[][]
++setViews(model:PowerMapModel):void
+-map(cell:Cell):CellView
++repaintAll(model:PowerMapModel):void
++repaint (x:int, y:int, on:boolean):void
+}
+
+abstract class CellView ..|> CellListener
+abstract class CellView{
+# x : int;
+# y : int;
+
+# bColor : int;
+# fColor : int;
+
++ CellView(x : int, y : int)
+}
+
+class BranchView --|> CellView
+class BranchView{
+- upArray : char[][]
+- downArray : char[][]
+- leftArray : char[][]
+- rightArray : char[][]
++ brach : Branch
++ BranchView(x : int, y : int, branch : Branch)
++ draw(on : boolean) : void
+}
+
+class CurveView --|> CellView
+class CurveView{
++ curve : Curve
+- upArray : char[][]
+- downArray : char[][]
+- leftArray : char[][]
+- rightArray : char[][]
++ CurveView(x : int, y : int, curve : Curve)
++ draw(on : boolean) : void
+}
+
+class HomeView --|> CellView
+class HomeView{
+
++ home : Home
+
+- upArray : char[][]
+- downArray : char[][]
+- leftArray : char[][]
+- rightArray : char[][]
+
++ HomeView(x : int, y : int, home : Home)
++ draw(on : boolean) : void
+}
+class LineView --|> CellView
+class LineView{
+
++ line : Line
+
+- upArray : char[][]
+- downArray : char[][]
+
++ LineView(x : int, y : int, line : Line)
++ draw(on : boolean) : void
+}
+class PowerView --|> CellView
+class PowerView{
+
++ power : Power
+
+- upArray : char[][]
+- downArray : char[][]
+- leftArray : char[][]
+- rightArray : char[][]
+
+
++ PowerView(x : int, y : int, power : Power)
++ draw(on : boolean) : void
+}
+}
+
+@enduml
